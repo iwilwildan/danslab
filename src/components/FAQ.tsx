@@ -1,42 +1,51 @@
 import { motion } from 'framer-motion';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Github, Globe, Award, Shield } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Github, Globe, Award } from 'lucide-react';
 
 const FAQ = () => {
   const faqs = [
     {
-      question: "How long does it take to build an MVP?",
-      answer: "Most MVPs take 6-12 weeks depending on complexity. We focus on core features that validate your business idea quickly, then iterate based on user feedback. Our process includes weekly check-ins and continuous deployment so you can see progress in real-time."
+      question: 'How long does it take to build an MVP?',
+      answer:
+        'Most MVPs take 6-12 weeks depending on complexity. We focus on core features that validate your business idea quickly, then iterate based on user feedback. Our process includes weekly check-ins and continuous deployment so you can see progress in real-time.',
     },
     {
-      question: "What technologies do you use?",
-      answer: "We use modern, scalable technologies including React/Next.js for frontend, Node.js/Python for backend, and cloud platforms like AWS/Vercel for deployment. Our tech stack is chosen based on your specific needs, ensuring long-term maintainability and performance."
+      question: 'What technologies do you use?',
+      answer:
+        'We use modern, scalable technologies including React/Next.js for frontend, Node.js/Python for backend, and cloud platforms like AWS/Vercel for deployment. Our tech stack is chosen based on your specific needs, ensuring long-term maintainability and performance.',
     },
     {
-      question: "Do you provide ongoing support after launch?",
-      answer: "Absolutely! We offer flexible support packages including bug fixes, feature additions, performance monitoring, and strategic CTO guidance. Many of our clients continue working with us as their dedicated technical team as they scale."
+      question: 'Do you provide ongoing support after launch?',
+      answer:
+        'Absolutely! We offer flexible support packages including bug fixes, feature additions, performance monitoring, and strategic CTO guidance. Many of our clients continue working with us as their dedicated technical team as they scale.',
     },
     {
-      question: "What makes DansLab different from other agencies?",
-      answer: "We combine deep technical expertise with startup experience. Unlike typical agencies, we think like co-founders—considering business goals, user experience, and technical scalability. We're invested in your success and provide strategic guidance beyond just coding."
-    }
+      question: 'What makes DansLab different from other agencies?',
+      answer:
+        "We combine deep technical expertise with startup experience. Unlike typical agencies, we think like co-founders—considering business goals, user experience, and technical scalability. We're invested in your success and provide strategic guidance beyond just coding.",
+    },
   ];
 
   const trustBadges = [
     {
       icon: <Github className="w-6 h-6" />,
-      label: "1000+ Commits",
-      description: "Active open source contributor"
+      label: '1000+ Commits',
+      description: 'Active open source contributor',
     },
     {
       icon: <Globe className="w-6 h-6" />,
-      label: "99.9% Uptime",
-      description: "Reliable production deployments"
+      label: '99.9% Uptime',
+      description: 'Reliable production deployments',
     },
     {
       icon: <Award className="w-6 h-6" />,
-      label: "5-Star Reviews",
-      description: "Consistently high client satisfaction"
+      label: '5-Star Reviews',
+      description: 'Consistently high client satisfaction',
     },
     /*{
       icon: <Shield className="w-6 h-6" />,
@@ -73,8 +82,8 @@ const FAQ = () => {
           >
             <Accordion type="single" collapsible className="space-y-4">
               {faqs.map((faq, index) => (
-                <AccordionItem 
-                  key={index} 
+                <AccordionItem
+                  key={index}
                   value={`item-${index}`}
                   className="bg-white rounded-lg shadow-sm border border-gray-100 px-6"
                 >
@@ -120,9 +129,7 @@ const FAQ = () => {
                 <h4 className="font-poppins font-bold text-dark-navy mb-2">
                   {badge.label}
                 </h4>
-                <p className="text-sm text-gray-600">
-                  {badge.description}
-                </p>
+                <p className="text-sm text-gray-600">{badge.description}</p>
               </motion.div>
             ))}
           </div>

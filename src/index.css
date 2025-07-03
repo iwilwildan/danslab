@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 28 17% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 28 17% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 28 17% 11%;
+  --primary: 210 79% 64%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 28 17% 11%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 50 100% 63%;
+  --accent-foreground: 28 17% 11%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 210 79% 64%;
+  --radius: 0.5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  color: #1C1C2E;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 700;
+  color: #1C1C2E;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.project-card {
+  transition: all 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(74, 144, 226, 0.1);
+}
+
+.testimonial-card {
+  background: white;
+  border-top: 3px solid #4A90E2;
+}
+
+.cta-button {
+  background: #4A90E2;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background: #3a7bc8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(74, 144, 226, 0.3);
+}
+
+.secondary-cta {
+  border: 2px solid #4A90E2;
+  color: #4A90E2;
+  transition: all 0.3s ease;
+}
+
+.secondary-cta:hover {
+  background: #4A90E2;
+  color: white;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

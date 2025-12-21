@@ -204,6 +204,8 @@
     </style>
 </head>
 <body>
+    <div id="fb-root"></div>
+    
     <div class="container">
         <div class="logo">🤖</div>
         <h1>DanslabAgent</h1>
@@ -245,6 +247,81 @@
         // Your Meta App ID
         const APP_ID = '783448838087021';
         
+        // Your Embedded Signup Configuration ID
+        const CONFIG_ID = '737980585535743';
+        
+        // ============================================
+        // LISTEN TO EMBEDDED SIGNUP EVENTS
+        // ============================================
+        
+        window.addEventListener('message', (event) => {
+            // Only accept messages from Facebook
+            if (event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") {
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Received message from Facebook:', data);
+                
+                if (data.type === 'WA_EMBEDDED_SIGNUP') {
+                    // Handle different events
+                    if (data.event === 'FINISH') {
+                        // Standard Cloud API signup finished
+                        const { phone_number_id, waba_id } = data.data;
+                        console.log("Phone number ID:", phone_number_id);
+                        console.log("WhatsApp Business Account ID:", waba_id);
+                        
+                        showStatus('✅ WhatsApp connected successfully!', 'success');
+                        showDebugInfo({
+                            event: 'FINISH',
+                            phone_number_id: phone_number_id,
+                            waba_id: waba_id,
+                            timestamp: new Date().toISOString(),
+                            message: 'Save these IDs to your n8n workflow or database'
+                        });
+                        
+                    } else if (data.event === 'FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING') {
+                        // Coexistence signup finished
+                        const { waba_id } = data.data;
+                        console.log("Coexistence onboarding complete!");
+                        console.log("WhatsApp Business Account ID:", waba_id);
+                        
+                        showStatus('✅ WhatsApp Business App connected successfully in co-existence mode!', 'success');
+                        showDebugInfo({
+                            event: 'FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING',
+                            waba_id: waba_id,
+                            timestamp: new Date().toISOString(),
+                            message: 'Co-existence mode activated! Use WABA ID to query phone_number_id via API'
+                        });
+                        
+                    } else if (data.event === 'CANCEL') {
+                        const { current_step } = data.data;
+                        console.warn("User cancelled at step:", current_step);
+                        showStatus('❌ Connection cancelled at step: ' + current_step, 'error');
+                        document.getElementById('connectBtn').disabled = false;
+                        
+                    } else if (data.event === 'ERROR') {
+                        const { error_message } = data.data;
+                        console.error("Error during signup:", error_message);
+                        showStatus('❌ Error: ' + error_message, 'error');
+                        document.getElementById('connectBtn').disabled = false;
+                    }
+                }
+                
+                // Always show raw response for debugging
+                const debugDiv = document.getElementById('debugInfo');
+                if (!debugDiv.classList.contains('show')) {
+                    debugDiv.innerHTML = '<strong>📡 Session Info Response:</strong><pre>' + 
+                        JSON.stringify(data, null, 2) + '</pre>';
+                    debugDiv.classList.add('show');
+                }
+                
+            } catch (error) {
+                console.log('Non-JSON response:', event.data);
+            }
+        });
+        
         // ============================================
         // FACEBOOK SDK INITIALIZATION
         // ============================================
@@ -275,51 +352,52 @@
         }(document, 'script', 'facebook-jssdk'));
         
         // ============================================
-        // EMBEDDED SIGNUP FUNCTION (SIMPLIFIED)
+        // EMBEDDED SIGNUP FUNCTION WITH COEXISTENCE
         // ============================================
+        
+        const fbLoginCallback = (response) => {
+            console.log('FB.login callback response:', response);
+            
+            if (response.authResponse) {
+                const code = response.authResponse.code;
+                console.log('Authorization code received:', code);
+                
+                showStatus('✅ Authorization successful! Processing...', 'success');
+                showDebugInfo({
+                    code: code,
+                    timestamp: new Date().toISOString(),
+                    message: 'Exchange this code for access token on your backend (server-to-server)'
+                });
+                
+                // Re-enable button
+                setTimeout(() => {
+                    document.getElementById('connectBtn').disabled = false;
+                }, 3000);
+                
+            } else {
+                console.log('User cancelled login or did not fully authorize.');
+                showStatus('❌ Connection cancelled. Please try again.', 'error');
+                document.getElementById('connectBtn').disabled = false;
+            }
+        };
         
         function launchWhatsAppSignup() {
             showStatus('🔄 Opening WhatsApp signup flow...', 'info');
-            console.log('Launching WhatsApp Embedded Signup (Simplified)');
+            console.log('Launching WhatsApp Embedded Signup with Coexistence support');
             
             // Disable button during process
             document.getElementById('connectBtn').disabled = true;
             
-            // SIMPLIFIED APPROACH: No config_id, direct access token
-            FB.login(function(response) {
-                console.log('FB.login response:', response);
-                
-                if (response.authResponse) {
-                    const accessToken = response.authResponse.accessToken;
-                    const userID = response.authResponse.userID;
-                    
-                    console.log('Access token received:', accessToken);
-                    console.log('User ID:', userID);
-                    
-                    showStatus('✅ WhatsApp connected successfully!', 'success');
-                    showDebugInfo({
-                        accessToken: accessToken,
-                        userID: userID,
-                        timestamp: new Date().toISOString(),
-                        message: 'Save this access token to your n8n workflow or database'
-                    });
-                    
-                    // Show instructions
-                    setTimeout(() => {
-                        showStatus('✅ Success! Copy the access token from debug info below and save it to your n8n workflow.', 'success');
-                    }, 2000);
-                    
-                } else {
-                    console.log('User cancelled login or did not fully authorize.');
-                    showStatus('❌ Connection cancelled. Please try again.', 'error');
-                    document.getElementById('connectBtn').disabled = false;
-                }
-            }, {
-                scope: 'whatsapp_business_management,whatsapp_business_messaging',
+            // Launch Facebook login with Embedded Signup
+            FB.login(fbLoginCallback, {
+                config_id: CONFIG_ID,
+                response_type: 'code',
+                override_default_response_type: true,
                 extras: {
                     setup: {},
                     // THIS IS THE KEY FOR CO-EXISTENCE MODE
-                    featureType: 'whatsapp_business_app_onboarding'
+                    featureType: 'whatsapp_business_app_onboarding',
+                    sessionInfoVersion: '3'
                 }
             });
         }
@@ -336,9 +414,9 @@
         
         function showDebugInfo(data) {
             const debugDiv = document.getElementById('debugInfo');
-            debugDiv.innerHTML = '<strong>🔐 Access Token (Save this!):</strong><pre>' + 
+            debugDiv.innerHTML = '<strong>🔐 Debug Info:</strong><pre>' + 
                 JSON.stringify(data, null, 2) + '</pre>' +
-                '<p style="margin-top: 10px; color: #c53030;"><strong>⚠️ Important:</strong> Copy the full access token and save it securely in your n8n workflow or environment variables. This token allows your app to send/receive WhatsApp messages.</p>';
+                '<p style="margin-top: 10px; color: #c53030;"><strong>⚠️ Important:</strong> Save this information securely. You\'ll need it to configure your n8n workflow.</p>';
             debugDiv.classList.add('show');
         }
         

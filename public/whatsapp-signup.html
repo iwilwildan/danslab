@@ -298,7 +298,7 @@
                     
                     showStatus('✅ WhatsApp connected successfully!', 'success');
                     showDebugInfo({
-                        accessToken: accessToken.substring(0, 20) + '...',
+                        accessToken: accessToken,
                         userID: userID,
                         timestamp: new Date().toISOString(),
                         message: 'Save this access token to your n8n workflow or database'
